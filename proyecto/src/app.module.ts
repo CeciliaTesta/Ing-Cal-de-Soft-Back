@@ -48,7 +48,11 @@ import { BusquedasModule } from './modules/gestion-documentos/busquedas/busqueda
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       // entities,
       synchronize: false,  
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: true } : false,
+      ssl: (() => {
+        if (process.env.DB_SSL !== 'true') return false;
+        const ca = process.env.DB_SSL_CA;
+        return { require: true, rejectUnauthorized: false, ...(ca ? { ca } : {}) };
+      })(),
     }),
 
     MarcaModule,
