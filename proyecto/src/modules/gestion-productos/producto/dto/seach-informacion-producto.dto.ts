@@ -5,7 +5,7 @@ import { IsDate, IsInt, IsOptional, Min } from "class-validator";
 
 export class SearchInformacionProductoDto  {
   @Type(() => Number)
-  @IsInt()
+  @IsInt({ message: 'El ID del producto debe ser un número entero' })
   productoId: number;
 
   @IsDate()

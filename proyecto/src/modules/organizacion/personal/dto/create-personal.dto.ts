@@ -13,14 +13,14 @@ export class CreatePersonalDto {
     })
     denominacion: string;
 
-    @IsEmail()
+    @IsEmail({}, { message: 'El correo electrónico debe ser una dirección de correo válida.' })
     mail: string;
 
     @IsBoolean()
     esVendedor: boolean;
     
     @IsOptional()
-    @IsString()
+    @IsString({ message: 'La observación debe ser un texto.' })
     observacion?: string;
 
     createdAt: Date;

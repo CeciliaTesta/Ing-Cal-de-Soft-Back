@@ -10,11 +10,11 @@ export class MarcaDto  {
   id: number;
 
   @ApiProperty({ example: 'IVECO', description: 'Denominación o nombre del producto. Esta formado por la linea y la marca' })
-  @IsString()
+  @IsString({ message: 'La denominación debe ser un texto' })
   denominacion: string;
 
   @ApiProperty({ example: '', description: 'Observaciones varias sobre la marca' })
-  @IsString()
+  @IsString({ message: 'La observación debe ser un texto' })
   observacion: string;
 
   @ApiProperty({ example: 1, description: 'de sistema no se puede editar ni eliminar' })

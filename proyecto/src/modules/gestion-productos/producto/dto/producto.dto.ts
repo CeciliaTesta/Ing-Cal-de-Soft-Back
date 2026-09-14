@@ -25,19 +25,19 @@ export class ProductoDto {
     description:
       'Denominación o nombre del producto. Esta formado por la linea y la marca',
   })
-  @IsString()
+  @IsString({ message: 'La denominación debe ser un texto' })
   denominacion: string;
 
   @ApiProperty()
-  @IsString()
+  @IsString({ message: 'La observación debe ser un texto' })
   observacion?: string;
 
   @ApiProperty()
-  @IsString()
+  @IsString({ message: 'El código del proveedor debe ser un texto' })
   codigoProveedor: string;
 
   @ApiProperty()
-  @IsString()
+  @IsString({ message: 'El código de barras debe ser un texto' })
   codigoBarra?: string;
 
   @ApiProperty()
