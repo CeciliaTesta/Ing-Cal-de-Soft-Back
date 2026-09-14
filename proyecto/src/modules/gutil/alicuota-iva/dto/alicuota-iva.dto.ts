@@ -16,7 +16,7 @@ export class AlicuotaIvaDto {
     example: 'Consumidor Final',
     description: 'Denominación de la condición de IVA',
   })
-  @IsString()
+  @IsString({ message: 'La denominación debe ser un texto' })
   denominacion: string;
 
   @ApiProperty({ example: 0.21, description: 'la alicuota de la condición de IVA' })
@@ -28,7 +28,7 @@ export class AlicuotaIvaDto {
     example: 'Consumidor Final',
     description: 'Denominación de la condición de IVA',
   })
-  @IsString()
+  @IsString({ message: 'La observación debe ser un texto' })
   observacion: string;
 
 

@@ -16,7 +16,7 @@ export class CondicionIvaDto {
     example: 'Consumidor Final',
     description: 'Denominación de la condición de IVA',
   })
-  @IsString()
+  @IsString({ message: 'La denominación debe ser un texto' })
   denominacion: string;
 
   @ApiProperty({

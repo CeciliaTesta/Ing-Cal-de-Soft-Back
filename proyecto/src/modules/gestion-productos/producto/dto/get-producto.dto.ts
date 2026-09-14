@@ -22,7 +22,7 @@ export class GetProductoDto {
     description:
       'Denominación o nombre del producto. Esta formado por la linea y la marca',
   })
-  @IsString()
+  @IsString({ message: 'La denominación debe ser un texto' })
   denominacion: string;
 
   @ApiProperty({
@@ -30,19 +30,19 @@ export class GetProductoDto {
     description:
       'Codigo proveedor Denominación o nombre del producto. Esta formado por la linea y la marca',
   })
-  @IsString()
+  @IsString({ message: 'El código del proveedor debe ser un texto' })
   codigoProveedorDenominacion: string;
 
   @ApiProperty({ example: 'ABC-1234', description: 'Código del proveedor' })
-  @IsString()
+  @IsString({ message: 'El código del proveedor debe ser un texto' })
   codigoProveedor: string;
 
   @ApiProperty({ example: 'ABC-1234', description: 'Código del proveedor' })
-  @IsString()
+  @IsString({ message: 'El nombre del proveedor debe ser un texto' })
   proveedor: string;
 
   @ApiProperty({ example: 'ABC-1234', description: 'Código del proveedor' })
-  @IsString()
+  @IsString({ message: 'La ubicación debe ser un texto' })
   ubicacion: string;
 
   @ApiProperty({ example: 50, description: 'Cantidad en stock' })

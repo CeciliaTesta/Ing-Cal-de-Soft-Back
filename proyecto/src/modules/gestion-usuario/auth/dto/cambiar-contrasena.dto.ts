@@ -1,9 +1,9 @@
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 
 export class CambiarContrasenaDto {
-  @IsEmail()
+  @IsEmail({}, { message: 'El correo electrónico debe ser un correo válido' })
   mail: string;
 
-  @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres.' })
+  @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres.' })
   nuevaContrasena: string;
 }

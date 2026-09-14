@@ -11,14 +11,14 @@ import {
 export class LineaDto {
   @ApiProperty({ example: 123, description: 'ID del la linea' })
   @Type(() => Number)
-  @IsInt()
+  @IsInt({ message: 'El id debe ser un número entero' })
   id: number;
 
   @ApiProperty({
     example: 'tornillos',
     description: 'Denominación o nombre dela linea',
   })
-  @IsString()
+  @IsString({ message: 'La denominación debe ser un texto' })
   denominacion: string;
 
   @IsOptional()
@@ -34,7 +34,7 @@ export class LineaDto {
     example: '',
     description: 'Observaciones varias sobre la linea',
   })
-  @IsString()
+  @IsString({ message: 'La observación debe ser un texto' })
   observacion: string;
 
   @ApiProperty({
@@ -42,7 +42,7 @@ export class LineaDto {
     description: 'de sistema no se puede editar ni eliminar',
   })
   @Type(() => Number)
-  @IsInt()
+  @IsInt({ message: 'El sistema debe ser un número entero' })
   sistema: number;
 
   @ApiProperty({ example: null, description: 'Fecha de eliminación (null si está activa)', nullable: true })
