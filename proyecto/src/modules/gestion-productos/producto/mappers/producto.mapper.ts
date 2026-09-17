@@ -7,6 +7,7 @@ import { ProductoDto } from '../dto/producto.dto';
 
 import {
   toReferenciaDto,
+  toReferenciaDtoOrEmpty,
 } from 'src/modules/common/utils/mappers/referencia.mapper';
 
 export class ProductoMapper {
@@ -89,6 +90,7 @@ export class ProductoMapper {
       envioGratis: entity.envioGratis ?? false,
       linea: toReferenciaDto(entity.linea),
       marca: toReferenciaDto(entity.marca),
+      presentacion: toReferenciaDtoOrEmpty(entity.presentacion),
       alicuotaIva: entity.alicuotaIva,
       ubicacion: entity.ubicacion ?? '',
       utilizaStockMinimo: entity.utilizaStockMinimo ?? false,

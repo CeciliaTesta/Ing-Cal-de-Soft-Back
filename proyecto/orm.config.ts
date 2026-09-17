@@ -15,6 +15,12 @@ export default new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
 
+  ssl: (() => {
+    if (process.env.DB_SSL !== 'true') return false;
+    const ca = process.env.DB_SSL_CA;
+    return { require: true, rejectUnauthorized: false, ...(ca ? { ca } : {}) };
+  })(),
+
   entities: [__dirname + '/src/**/*.entity.ts'],
   migrations: [__dirname + '/src/migrations/*{.ts,.js}'],
 

@@ -9,30 +9,30 @@ import { ensureNotSistemaEntity } from 'src/modules/common/utils/atrituto-sistem
 import { UsuarioService } from 'src/modules/gestion-usuario/usuario/application/services/usuario.service';
 import { PaginacionUtils } from 'src/modules/common/utils/pagination/paginacion-utils';
 import { MessageFrontUtils } from 'src/modules/common/utils/message/message-front.util';
-import { IMarcaRepository } from '../../domain/interfaces/marca.repository.interface';
-import { UpdateMarcaDto } from '../../dto/update-presentacion.dto';
-import { CreateMarcaDto } from '../../dto/create-presentacion.dto';
-import { MarcaDto } from '../../dto/presentacion.dto';
-import { MarcaMapper } from '../../mappers/marca.mapper';
-import { PoliticaEliminacionMarca } from '../../domain/services/politica-eliminacion-marca.service';
+import { IPresentacionRepository } from '../../domain/interfaces/presentacion.repository.interface';
+import { UpdatePresentacionDto } from '../../dto/update-presentacion.dto';
+import { CreatePresentacionDto } from '../../dto/create-presentacion.dto';
+import { PresentacionDto } from '../../dto/presentacion.dto';
+import { PresentacionMapper } from '../../mappers/presentacion.mapper';
+import { PoliticaEliminacionPresentacion } from '../../domain/services/politica-eliminacion-presentacion.service';
 
-import { Marca } from '../../domain/entities/marca.entity';
+import { Presentacion } from '../../domain/entities/presentacion.entity';
 
 @Injectable()
-export class MarcaService {
-  private readonly logger = new Logger(MarcaService.name);
+export class PresentacionService {
+  private readonly logger = new Logger(PresentacionService.name);
   constructor(
-    @Inject('IMarcaRepository')
-    private readonly repository: IMarcaRepository,
+    @Inject('IPresentacionRepository')
+    private readonly repository: IPresentacionRepository,
     private readonly usuarioService: UsuarioService,
-    private readonly validacionesService: PoliticaEliminacionMarca,
+    private readonly validacionesService: PoliticaEliminacionPresentacion,
   ) {}
 
-  private readonly ENTITY_NAME = 'Marca';
+  private readonly ENTITY_NAME = 'Presentacion';
 
-  async create(dto: CreateMarcaDto) {
+  async create(dto: CreatePresentacionDto) {
     this.logger.log(
-      `Creando un nuevo ${this.ENTITY_NAME} con denominación: ${dto.denominacion} a: ${dto.denominacion}`,
+      `Creando un nuevo ${this.ENTITY_NAME} con denominación: ${dto.denominacion}`,
     );
     await this.checkDenominacionExists(dto.denominacion, 0);
     const entity = await this.repository.create(dto);
@@ -44,10 +44,10 @@ export class MarcaService {
     );
   }
 
-  async update(id: number, dto: UpdateMarcaDto) {
+  async update(id: number, dto: UpdatePresentacionDto) {
     this.logger.log(`Actualizando  ${this.ENTITY_NAME} con ID: ${id}`);
-    const marca = await this.findEntityById(id);
-    ensureNotSistemaEntity(marca, 'Marca');
+    const presentacion = await this.findEntityById(id);
+    ensureNotSistemaEntity(presentacion, 'Presentacion');
 
     if (dto.denominacion)
       await this.checkDenominacionExists(dto.denominacion, id);
@@ -62,25 +62,25 @@ export class MarcaService {
 
   async findAllFor(
     denominacion: string,
-  ): Promise<{ data: MarcaDto[]; total: number }> {
+  ): Promise<{ data: PresentacionDto[]; total: number }> {
     const result = await this.repository.findAllFor(denominacion);
-    const data: MarcaDto[] = result.map((marca) => MarcaMapper.toDto(marca));
+    const data: PresentacionDto[] = result.map((presentacion) => PresentacionMapper.toDto(presentacion));
     return {
       data,
       total: 1,
     };
   }
 
-  async findAllListado(): Promise<Marca[]> {
+  async findAllListado(): Promise<Presentacion[]> {
     const result = await this.repository.findAllListado();
     return result;
   }
 
   async findAllSinSistemaFor(
     denominacion: string,
-  ): Promise<{ data: MarcaDto[]; total: number }> {
+  ): Promise<{ data: PresentacionDto[]; total: number }> {
     const result = await this.repository.findAllSinSistemaFor(denominacion);
-    const data: MarcaDto[] = result.map((marca) => MarcaMapper.toDto(marca));
+    const data: PresentacionDto[] = result.map((presentacion) => PresentacionMapper.toDto(presentacion));
     return {
       data,
       total: 1,
@@ -89,9 +89,9 @@ export class MarcaService {
 
   async findAllSistemaFor(
     denominacion: string,
-  ): Promise<{ data: MarcaDto[]; total: number }> {
+  ): Promise<{ data: PresentacionDto[]; total: number }> {
     const result = await this.repository.findAllSistemaFor(denominacion);
-    const data: MarcaDto[] = result.map((marca) => MarcaMapper.toDto(marca));
+    const data: PresentacionDto[] = result.map((presentacion) => PresentacionMapper.toDto(presentacion));
     return {
       data,
       total: 1,
@@ -103,11 +103,11 @@ export class MarcaService {
     skip = 0,
     take = 10,
     incluirEliminados = false,
-  ): Promise<{ data: MarcaDto[]; total: number }> {
+  ): Promise<{ data: PresentacionDto[]; total: number }> {
     this.logger.log(`  Buscando o ${denominacion}  skip=${skip}, take=${take}`);
     const result = await this.repository.findBy(denominacion, skip, take, incluirEliminados);
-    const data: MarcaDto[] = result.data.map((marca) =>
-      MarcaMapper.toDto(marca),
+    const data: PresentacionDto[] = result.data.map((presentacion) =>
+      PresentacionMapper.toDto(presentacion),
     );
     return {
       data,
@@ -121,7 +121,7 @@ export class MarcaService {
       throw new NotFoundException(
         `${this.ENTITY_NAME} con ID ${id} no encontrado.`,
       );
-    return MarcaMapper.toDto(entity);
+    return PresentacionMapper.toDto(entity);
   }
 
   async findEntityById(id: number) {
@@ -142,14 +142,14 @@ export class MarcaService {
       );
     }
 
-    ensureNotSistemaEntity(entity, 'Marca');
+    ensureNotSistemaEntity(entity, 'Presentacion');
 
     const tieneProductosActivos =
-      await this.validacionesService.tieneProductosActivosParaMarca(id);
+      await this.validacionesService.tieneProductosActivosParaPresentacion(id);
 
     if (tieneProductosActivos) {
       throw new ConflictException(
-        'No se puede eliminar la marca porque está asociada a productos activos.',
+        'No se puede eliminar la presentación porque está asociada a productos activos.',
       );
     }
 

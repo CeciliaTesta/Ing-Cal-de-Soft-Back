@@ -1,9 +1,9 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { DataSource, IsNull, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IMarcaRepository } from '../../domain/interfaces/marca.repository.interface';
-import { CreateMarcaDto } from '../../dto/create-presentacion.dto';
-import { Marca } from '../../domain/entities/marca.entity';
+import { IPresentacionRepository } from '../../domain/interfaces/presentacion.repository.interface';
+import { CreatePresentacionDto } from '../../dto/create-presentacion.dto';
+import { Presentacion } from '../../domain/entities/presentacion.entity';
 import { DatabaseConnectionException } from 'src/modules/common/exceptions/database-connection.exception';
 import { EntityNotFoundException } from 'src/modules/common/exceptions/entity-notFound-exceptions';
 import { Transactional } from 'src/modules/common/decorators/transactional.decoratos';
@@ -16,17 +16,17 @@ import { QueryBuilderHelper } from 'src/modules/common/query-builders/query-buil
 import { handleDatabaseError } from 'src/modules/common/query-builders/database-error.helper';
 
 @Injectable()
-export class MarcaPersistenceAdapter
-  extends BasePersistenceAdapter<Marca>
-  implements IMarcaRepository
+export class PresentacionPersistenceAdapter
+  extends BasePersistenceAdapter<Presentacion>
+  implements IPresentacionRepository
 {
-  private readonly logger = new Logger(MarcaPersistenceAdapter.name);
+  private readonly logger = new Logger(PresentacionPersistenceAdapter.name);
 
-  protected readonly ALIAS = 'marca';
+  protected readonly ALIAS = 'presentacion';
 
   constructor(
-    @InjectRepository(Marca)
-    repository: Repository<Marca>,
+    @InjectRepository(Presentacion)
+    repository: Repository<Presentacion>,
     private readonly dataSource: DataSource,
     @Inject('UnitOfWork') public readonly uow: IUnitOfWork,
   ) {
@@ -34,13 +34,13 @@ export class MarcaPersistenceAdapter
   }
 
   @Transactional()
-  async create(data: CreateMarcaDto): Promise<Marca> {
-    const repo = this.uow.getRepository(Marca);
+  async create(data: CreatePresentacionDto): Promise<Presentacion> {
+    const repo = this.uow.getRepository(Presentacion);
     const nueva = repo.create(data);
     return await repo.save(nueva);
   }
 
-  async findAllFor(denominacion: string): Promise<Marca[]> {
+  async findAllFor(denominacion: string): Promise<Presentacion[]> {
     try {
       const query = this.baseQuery().andWhere(
         `UPPER(${this.ALIAS}.denominacion) LIKE :denominacion`,
@@ -56,7 +56,7 @@ export class MarcaPersistenceAdapter
 
   }
 
-  async findAllListado(): Promise<Marca[]> {
+  async findAllListado(): Promise<Presentacion[]> {
     try {
       const query = this.baseQuery();
       QueryBuilderHelper.applyOrder(query, this.ALIAS, 'denominacion', 'ASC');
@@ -67,19 +67,19 @@ export class MarcaPersistenceAdapter
 
   }
 
-  async findAllSinSistemaFor(denominacion: string): Promise<Marca[]> {
+  async findAllSinSistemaFor(denominacion: string): Promise<Presentacion[]> {
     try {
       const query = this.repository
-        .createQueryBuilder('marca')
+        .createQueryBuilder('presentacion')
 
-        .where('marca.deletedAt IS NULL')
-        .andWhere('marca.sistema = :sistema', { sistema: 0 });
+        .where('presentacion.deletedAt IS NULL')
+        .andWhere('presentacion.sistema = :sistema', { sistema: 0 });
 
-      query.andWhere('UPPER(marca.denominacion) LIKE :denominacion', {
+      query.andWhere('UPPER(presentacion.denominacion) LIKE :denominacion', {
         denominacion: `%${denominacion.toUpperCase()}%`,
       });
 
-      return await query.orderBy('marca.denominacion', 'ASC').getMany();
+      return await query.orderBy('presentacion.denominacion', 'ASC').getMany();
     } catch (error) {
       throw new DatabaseConnectionException(
         'Error al conectar con la base de datos.',
@@ -87,19 +87,19 @@ export class MarcaPersistenceAdapter
     }
   }
 
-  async findAllSistemaFor(denominacion: string): Promise<Marca[]> {
+  async findAllSistemaFor(denominacion: string): Promise<Presentacion[]> {
     try {
       const query = this.repository
-        .createQueryBuilder('marca')
+        .createQueryBuilder('presentacion')
 
-        .where('marca.deletedAt IS NULL')
-        .andWhere('marca.sistema = :sistema', { sistema: 1 });
+        .where('presentacion.deletedAt IS NULL')
+        .andWhere('presentacion.sistema = :sistema', { sistema: 1 });
 
-      query.andWhere('UPPER(marca.denominacion) LIKE :denominacion', {
+      query.andWhere('UPPER(presentacion.denominacion) LIKE :denominacion', {
         denominacion: `%${denominacion.toUpperCase()}%`,
       });
 
-      return await query.orderBy('marca.denominacion', 'ASC').getMany();
+      return await query.orderBy('presentacion.denominacion', 'ASC').getMany();
     } catch (error) {
       throw new DatabaseConnectionException(
         'Error al conectar con la base de datos.',
@@ -107,7 +107,7 @@ export class MarcaPersistenceAdapter
     }
   }
 
-  async findOne(id: number): Promise<Marca | null> {
+  async findOne(id: number): Promise<Presentacion | null> {
     try {
       const entity = await this.repository.findOne({
         where: { id, deletedAt: IsNull() },
@@ -131,7 +131,7 @@ export class MarcaPersistenceAdapter
     }
   }
 
-  async findByDenominacion(denominacion: string): Promise<Marca | null> {
+  async findByDenominacion(denominacion: string): Promise<Presentacion | null> {
     try {
       const entity = await this.repository.findOne({
         where: { denominacion, deletedAt: IsNull() },
@@ -149,7 +149,7 @@ export class MarcaPersistenceAdapter
     skip = 0,
     take = 10,
     incluirEliminados = false,
-  ): Promise<{ data: Marca[]; total: number }> {
+  ): Promise<{ data: Presentacion[]; total: number }> {
     try {
       const query = this.baseQuery(incluirEliminados);
 
@@ -174,33 +174,33 @@ export class MarcaPersistenceAdapter
   async findByIdConAuditoria(id: number): Promise<AuditoriaDto | null> {
     try {
       const raw = await this.repository
-        .createQueryBuilder('marca')
+        .createQueryBuilder('presentacion')
         .leftJoin(
           'usuario',
           'usuarioCreated',
-          'usuarioCreated.id = marca.usuarioCreatedId',
+          'usuarioCreated.id = presentacion.usuarioCreatedId',
         )
         .leftJoin(
           'usuario',
           'usuarioUpdated',
-          'usuarioUpdated.id = marca.usuarioUpdatedId',
+          'usuarioUpdated.id = presentacion.usuarioUpdatedId',
         )
         .leftJoin(
           'usuario',
           'usuarioDeleted',
-          'usuarioDeleted.id = marca.usuarioDeletedId',
+          'usuarioDeleted.id = presentacion.usuarioDeletedId',
         )
         .addSelect([
-          'marca.id as marca_id',
-          'marca.denominacion as marca_denominacion',
-          'marca.createdAt as marca_createdAt',
-          'marca.updatedAt as marca_updatedAt',
-          'marca.deletedAt as marca_deletedAt',
+          'presentacion.id as presentacion_id',
+          'presentacion.denominacion as presentacion_denominacion',
+          'presentacion.createdAt as presentacion_createdAt',
+          'presentacion.updatedAt as presentacion_updatedAt',
+          'presentacion.deletedAt as presentacion_deletedAt',
           'usuarioCreated.denominacion as usuarioCreated_nombre',
           'usuarioUpdated.denominacion as usuarioUpdated_nombre',
           'usuarioDeleted.denominacion as usuarioDeleted_nombre',
         ])
-        .where('marca.id = :id', { id })
+        .where('presentacion.id = :id', { id })
         .getRawOne();
 
       console.debug('RAW RESULTADO:', raw);
@@ -208,18 +208,18 @@ export class MarcaPersistenceAdapter
       if (!raw) return null;
 
       return {
-        id: raw.marca_id ?? 0,
-        detalle: raw.marca_denominacion
-          ? `Marca ${raw.marca_denominacion}`
-          : 'Marca (sin denominación)',
-        createdAt: raw.marca_createdAt
-          ? FechaUtils.formatFechaHora(raw.marca_createdAt)
+        id: raw.presentacion_id ?? 0,
+        detalle: raw.presentacion_denominacion
+          ? `Presentacion ${raw.presentacion_denominacion}`
+          : 'Presentacion (sin denominación)',
+        createdAt: raw.presentacion_createdAt
+          ? FechaUtils.formatFechaHora(raw.presentacion_createdAt)
           : '',
-        updatedAt: raw.marca_updatedAt
-          ? FechaUtils.formatFechaHora(raw.marca_updatedAt)
+        updatedAt: raw.presentacion_updatedAt
+          ? FechaUtils.formatFechaHora(raw.presentacion_updatedAt)
           : '',
-        deletedAt: raw.marca_deletedAt
-          ? FechaUtils.formatFechaHora(raw.marca_deletedAt)
+        deletedAt: raw.presentacion_deletedAt
+          ? FechaUtils.formatFechaHora(raw.presentacion_deletedAt)
           : '',
         usuarioCreated: raw.usuarioCreated_nombre ?? '',
         usuarioUpdated: raw.usuarioUpdated_nombre ?? '',
@@ -234,17 +234,17 @@ export class MarcaPersistenceAdapter
   }
 
   @Transactional()
-  async update(id: number, data: Partial<Marca>): Promise<Marca> {
-    const repo = this.uow.getRepository(Marca);
+  async update(id: number, data: Partial<Presentacion>): Promise<Presentacion> {
+    const repo = this.uow.getRepository(Presentacion);
     const existente = await repo.findOneBy({ id });
-    if (!existente) throw new Error('Marca no encontrada');
+    if (!existente) throw new Error('Presentacion no encontrada');
     repo.merge(existente, data);
     return await repo.save(existente);
   }
 
   @Transactional()
-  async remove(entity: Marca, usuario: Usuario): Promise<Marca> {
-    const repo = this.uow.getRepository(Marca);
+  async remove(entity: Presentacion, usuario: Usuario): Promise<Presentacion> {
+    const repo = this.uow.getRepository(Presentacion);
     if (entity.deletedAt) {
       throw new NotFoundException('Entidad ya eliminada.');
     }
@@ -255,28 +255,27 @@ export class MarcaPersistenceAdapter
     return entity;
   }
 
-  async findByDenominacionWith(denominacion: string): Promise<Marca | null> {
-    // this.logger.log(`🔎 Buscando denominación (incluyendo borradas): ${denominacion}`);
+  async findByDenominacionWith(denominacion: string): Promise<Presentacion | null> {
     try {
       const normalizada = denominacion.trim().toUpperCase();
 
       const entity = await this.repository
-        .createQueryBuilder('marca')
-        .withDeleted() // 👈 permite traer registros eliminados (soft delete)
-        .where('UPPER(marca.denominacion) = :denominacion', {
+        .createQueryBuilder('presentacion')
+        .withDeleted() // permite traer registros eliminados (soft delete)
+        .where('UPPER(presentacion.denominacion) = :denominacion', {
           denominacion: normalizada,
         })
         .getOne();
 
       if (!entity) {
         this.logger.log(
-          `⚪ No encontrada marca (ni activa ni eliminada): ${normalizada}`,
+          `No encontrada presentación (ni activa ni eliminada): ${normalizada}`,
         );
         return null;
       }
 
       this.logger.log(
-        `✅ Encontrada marca (puede estar activa o eliminada): ID=${entity.id}, denominación=${entity.denominacion}`,
+        `Encontrada presentación (puede estar activa o eliminada): ID=${entity.id}, denominación=${entity.denominacion}`,
       );
       return entity;
     } catch (error) {

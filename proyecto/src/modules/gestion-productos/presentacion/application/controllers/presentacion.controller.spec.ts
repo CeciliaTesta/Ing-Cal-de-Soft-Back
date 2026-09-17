@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MarcaController } from './marca.controller';
+import { PresentacionController } from './presentacion.controller';
 import { NormalizeDenominacionSearchPipe } from 'src/modules/common/pipes/normalize-denominations-search.pipe';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from 'src/modules/gestion-usuario/auth/auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { MarcaService } from '../services/marca.service';
+import { PresentacionService } from '../services/presentacion.service';
 
 
 
-describe('MarcaController - Decorators', () => {
-  let controller: MarcaController;
-  let service: MarcaService;
+describe('PresentacionController - Decorators', () => {
+  let controller: PresentacionController;
+  let service: PresentacionService;
 
   const mockService = {
     findByDenominacionFiltered: jest.fn(),
@@ -31,10 +31,10 @@ describe('MarcaController - Decorators', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [MarcaController],
+      controllers: [PresentacionController],
       providers: [
         {
-          provide: MarcaService,
+          provide: PresentacionService,
           useValue: mockService,
         },
         {
@@ -56,8 +56,8 @@ describe('MarcaController - Decorators', () => {
       .useValue({ canActivate: () => true }) // Mock del guard
       .compile();
 
-    controller = module.get<MarcaController>(MarcaController);
-    service = module.get<MarcaService>(MarcaService);
+    controller = module.get<PresentacionController>(PresentacionController);
+    service = module.get<PresentacionService>(PresentacionService);
   });
 
   it('debería usar NormalizeDenominacionSearchPipe en el método search-by', () => {

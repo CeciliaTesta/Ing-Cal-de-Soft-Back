@@ -21,6 +21,8 @@ import { UpdateProductoDto } from '../../dto/update-producto.dto';
 import { ProductoMapper } from '../../mappers/producto.mapper';
 import { LineaService } from 'src/modules/gestion-productos/linea/application/services/linea.service';
 import { MarcaService } from 'src/modules/gestion-productos/marca/application/services/marca.service';
+import { PresentacionService } from 'src/modules/gestion-productos/presentacion/application/services/presentacion.service';
+import { Presentacion } from 'src/modules/gestion-productos/presentacion/domain/entities/presentacion.entity';
 import { ProductoIntrinsicValidationService } from '../../domain/services/producto-intrinsic-validation.service.ts';
 import { ProductoValidationService } from '../../domain/services/producto-validation.service.ts';
 import { ProductoRelatedEntitiesValidator } from '../../infraestructure/validators/producto-related-entities.validator.ts';
@@ -37,6 +39,8 @@ export class ProductoService {
 
     @Inject(forwardRef(() => MarcaService))
     private readonly marcaService: MarcaService,
+    @Inject(forwardRef(() => PresentacionService))
+    private readonly presentacionService: PresentacionService,
     private readonly proveedorService: ProveedorService,
     private readonly usuarioService: UsuarioService,
 
@@ -61,7 +65,7 @@ export class ProductoService {
     );
 
     // Orquestar todas las validaciones
-    const { marca, linea, usuario } =
+    const { marca, linea, presentacion, usuario } =
       await this.validarYPrepararCreacion(dto);
 
 
@@ -70,7 +74,7 @@ export class ProductoService {
       dto,
       linea,
       marca,
-
+      presentacion,
       usuario,
     );
 
@@ -84,7 +88,7 @@ export class ProductoService {
   async update(id: number, dto: UpdateProductoDto) {
     this.logger.log(`Actualizandox  ${this.ENTITY_NAME} con ID: ${id}`);
 
-    const { marca, linea, usuario } =
+    const { marca, linea, presentacion, usuario } =
       await this.validarYPrepararActualizacion(id, dto);
 
     const entity = await this.repository.update(
@@ -92,7 +96,7 @@ export class ProductoService {
       dto,
       linea,
       marca,
-
+      presentacion,
       usuario,
     );
 
@@ -259,6 +263,10 @@ export class ProductoService {
     return this.repository.existsProductosActivosByLinea(lineaId);
   }
 
+  async existsProductosActivosByPresentacion(presentacionId: number): Promise<boolean> {
+    return this.repository.existsProductosActivosByPresentacion(presentacionId);
+  }
+
 
   async findByIds(ids: number[]): Promise<Producto[]> {
     return this.repository.findByIds(ids);
@@ -352,7 +360,9 @@ export class ProductoService {
       dto.usuarioCreatedId,
     );
 
-    return { marca, linea, usuario };
+    const presentacion = await this.resolverPresentacion(dto.presentacionId);
+
+    return { marca, linea, presentacion, usuario };
   }
   /**
    * Orquesta todas las validaciones necesarias para actualizar un producto
@@ -413,8 +423,30 @@ export class ProductoService {
       dto.usuarioUpdatedId,
     );
 
-    return { marca, linea, usuario };
+    const presentacion =
+      dto.presentacionId === undefined
+        ? productoActual.presentacion ?? null
+        : await this.resolverPresentacion(dto.presentacionId);
+
+    return { marca, linea, presentacion, usuario };
   }
 
+  /**
+   * Resuelve la entidad Presentacion a partir de un id opcional.
+   * Un id nulo, indefinido o 0 se interpreta como "sin presentación".
+   */
+  private async resolverPresentacion(
+    presentacionId?: number | null,
+  ): Promise<Presentacion | null> {
+    if (presentacionId === undefined || presentacionId === null || presentacionId === 0) {
+      return null;
+    }
+    return this.presentacionService.findEntityById(presentacionId);
+  }
 
+  async findAllForPresentaciones(
+    denominacion: string,
+  ): Promise<{ data: any[]; total: number }> {
+    return this.presentacionService.findAllFor(denominacion);
+  }
 }

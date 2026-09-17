@@ -1,19 +1,19 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsBoolean, IsDate, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { IsInt, IsOptional, IsString } from "class-validator";
 
 
-export class MarcaDto  {
-  @ApiProperty({ example: 123, description: 'ID del la marca' })
+export class PresentacionDto {
+  @ApiProperty({ example: 123, description: 'ID de la presentación' })
   @Type(() => Number)
   @IsInt()
   id: number;
 
-  @ApiProperty({ example: 'IVECO', description: 'Denominación o nombre del producto. Esta formado por la linea y la marca' })
+  @ApiProperty({ example: '1L', description: 'Denominación de la presentación del producto (ej: 1L, pack, 500ml)' })
   @IsString()
   denominacion: string;
 
-  @ApiProperty({ example: '', description: 'Observaciones varias sobre la marca' })
+  @ApiProperty({ example: '', description: 'Observaciones varias sobre la presentación' })
   @IsString()
   observacion: string;
 

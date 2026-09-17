@@ -1,21 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CreateMarcaDto } from '../../dto/create-presentacion.dto';
-import { Marca } from '../../domain/entities/marca.entity';
-import { IMarcaRepository } from '../../domain/interfaces/marca.repository.interface';
+import { CreatePresentacionDto } from '../../dto/create-presentacion.dto';
+import { Presentacion } from '../../domain/entities/presentacion.entity';
+import { IPresentacionRepository } from '../../domain/interfaces/presentacion.repository.interface';
 import { DatabaseConnectionException } from 'src/modules/common/exceptions/database-connection.exception';
 import { Usuario } from 'src/modules/gestion-usuario/usuario/domain/entities/usuario.entity';
 import { AuditoriaDto } from 'src/modules/gestion-sistema/auditoria/dto/auditoria.dto';
-import { MarcaPersistenceAdapter } from './marca.persistence-adapters';
+import { PresentacionPersistenceAdapter } from './presentacion.persistence-adapters';
 
 @Injectable()
-export class MarcaRepository implements IMarcaRepository {
-  private readonly logger = new Logger(MarcaRepository.name);
+export class PresentacionRepository implements IPresentacionRepository {
+  private readonly logger = new Logger(PresentacionRepository.name);
 
-  constructor(private readonly persistenceService: MarcaPersistenceAdapter) {}
+  constructor(private readonly persistenceService: PresentacionPersistenceAdapter) {}
 
-  private readonly ENTITY_NAME = 'Marca';
+  private readonly ENTITY_NAME = 'Presentacion';
 
-  async create(data: CreateMarcaDto): Promise<Marca> {
+  async create(data: CreatePresentacionDto): Promise<Presentacion> {
     try {
       return await this.persistenceService.create(data);
     } catch (error) {
@@ -26,23 +26,23 @@ export class MarcaRepository implements IMarcaRepository {
     }
   }
 
-  async update(id: number, data: Partial<Marca>): Promise<Marca> {
+  async update(id: number, data: Partial<Presentacion>): Promise<Presentacion> {
     return this.persistenceService.update(id, data);
   }
 
-  async findAllFor(denominacion: string): Promise<Marca[]> {
+  async findAllFor(denominacion: string): Promise<Presentacion[]> {
     return this.persistenceService.findAllFor(denominacion);
   }
 
-  async findAllListado(): Promise<Marca[]> {
+  async findAllListado(): Promise<Presentacion[]> {
     return this.persistenceService.findAllListado();
   }
 
-  async findAllSinSistemaFor(denominacion: string): Promise<Marca[]> {
+  async findAllSinSistemaFor(denominacion: string): Promise<Presentacion[]> {
     return this.persistenceService.findAllSinSistemaFor(denominacion);
   }
 
-  async findAllSistemaFor(denominacion: string): Promise<Marca[]> {
+  async findAllSistemaFor(denominacion: string): Promise<Presentacion[]> {
     return this.persistenceService.findAllSistemaFor(denominacion);
   }
 
@@ -51,7 +51,7 @@ export class MarcaRepository implements IMarcaRepository {
     skip = 0,
     take = 10,
     incluirEliminados = false,
-  ): Promise<{ data: Marca[]; total: number }> {
+  ): Promise<{ data: Presentacion[]; total: number }> {
     this.logger.log(`Buscando o ${denominacion}  skip=${skip}, take=${take}`);
     return this.persistenceService.findBy(
       denominacion,
@@ -61,12 +61,12 @@ export class MarcaRepository implements IMarcaRepository {
     );
   }
 
-  async findOne(id: number): Promise<Marca | null> {
+  async findOne(id: number): Promise<Presentacion | null> {
     const entity = await this.persistenceService.findOne(id);
     return entity;
   }
 
-  async findByDenominacion(denominacion: string): Promise<Marca | null> {
+  async findByDenominacion(denominacion: string): Promise<Presentacion | null> {
     const entity =
       await this.persistenceService.findByDenominacion(denominacion);
     if (!entity) {
@@ -82,12 +82,12 @@ export class MarcaRepository implements IMarcaRepository {
     return entity;
   }
 
-  async remove(data: Marca, usuario: Usuario): Promise<Marca> {
+  async remove(data: Presentacion, usuario: Usuario): Promise<Presentacion> {
     const entity = this.persistenceService.remove(data, usuario);
     return entity;
   }
 
-  async findByDenominacionWith(denominacion: string): Promise<Marca | null> {
+  async findByDenominacionWith(denominacion: string): Promise<Presentacion | null> {
       const entity = await this.persistenceService.findByDenominacionWith(denominacion);
       return entity;
   }

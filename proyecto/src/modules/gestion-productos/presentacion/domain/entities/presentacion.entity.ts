@@ -1,4 +1,3 @@
-import { Usuario } from 'src/modules/gestion-usuario/usuario/domain/entities/usuario.entity';
 import {
   Entity,
   Column,
@@ -9,23 +8,22 @@ import {
   OneToMany,
   Index,
 } from 'typeorm';
-import { Producto } from '../../../producto/domain/entities/producto.entity';
+import { Producto } from 'src/modules/gestion-productos/producto/domain/entities/producto.entity';
 
-@Entity('marca')
+@Entity('presentacion')
 @Index(['denominacion', 'deletedAt'], { unique: true })
-export class Marca {
+export class Presentacion {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 255, })
+  @Column({ type: 'varchar', length: 255 })
   denominacion: string;
 
   @Column({ type: 'text', nullable: true })
   observacion?: string;
 
-  @OneToMany(() => Producto, (producto) => producto.marca)
+  @OneToMany(() => Producto, (producto) => producto.presentacion)
   productos: Producto[];
-
 
   @CreateDateColumn()
   createdAt: Date;
